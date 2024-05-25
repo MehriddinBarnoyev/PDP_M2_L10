@@ -10,100 +10,159 @@ import {
   Radio,
   RadioGroup,
   Select,
+  MenuItem,
   Slider,
   TextField,
   Typography,
 } from "@mui/material";
 import React from "react";
-// import DateTimeFieldValue from "../DateTime";
-import BasicDatePicker from "../DateTime";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 export default function Forma1() {
-  const { register, handleSubmit , formState:{errors}, reset} = useForm();
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-  const submit = (data) => {
-    console.log(data);
-    console.log();
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
     reset();
   };
-  console.log(errors);
 
   return (
-    <Box sx={{ mt: 3 }} onSubmit={handleSubmit(submit)} component={"form"}>
+    <Box sx={{ mt: 3 }} onSubmit={handleSubmit(onSubmit)} component={"form"}>
       <Typography variant="body1">Demo forma1</Typography>
       <Box>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} lg={4} sx={{ mt: 3 }}>
-            <Box>
-              <TextField
-                id="outlined-basic"
-                label="Ism"
-                variant="outlined"
-                fullWidth
-                error={errors.Name}
-                {...register("Name", { required: true , minLength:5, maxLength:255})}
-              />
-              {errors.Name && (
-              <Typography color="error">Ismingizni kiriting</Typography>
+            <TextField
+              id="outlined-basic"
+              label="Ism"
+              variant="outlined"
+              fullWidth
+              error={!!errors.Name}
+              {...register("Name", {
+                required: "Ismingizni kiriting",
+                minLength: 5,
+                maxLength: 255,
+              })}
+            />
+            {errors.Name && (
+              <Typography color="error">{errors.Name.message}</Typography>
             )}
-            </Box>
           </Grid>
         </Grid>
       </Box>
       <Grid item xs={12} sm={6} lg={4} sx={{ mt: 3 }}>
-        <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">Radio input</FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="none"
-            name="radio-buttons-group"
-          >
-            <FormControlLabel
-              value="Radio Option 1"
-              control={<Radio />}
-              label="Radio Option 1"
-            />
-            <FormControlLabel
-              value="Radio Option "
-              control={<Radio />}
-              label="Radio Option 2"
-              
-            />
-          </RadioGroup>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Radio input</FormLabel>
+          <Controller
+            name="RadioInput"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <RadioGroup {...field}>
+                <FormControlLabel
+                  value="Option1"
+                  control={<Radio />}
+                  label="Radio Option 1"
+                />
+                <FormControlLabel
+                  value="Option2"
+                  control={<Radio />}
+                  label="Radio Option 2"
+                />
+              </RadioGroup>
+            )}
+          />
         </FormControl>
         <Box sx={{ mt: 5, width: "500px" }}>
-          <Select
-            multiple
-            displayEmpty
-            value={""}
-            input={<FilledInput />}
-            fullWidth
-            inputProps={{ "aria-label": "Without label" }}
-          />
+          <FormControl fullWidth>
+            <Controller
+              name="SelectInput"
+              control={control}
+              defaultValue={[]}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  multiple
+                  displayEmpty
+                  input={<FilledInput />}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  <MenuItem value={"Option1"}>Option 1</MenuItem>
+                  <MenuItem value={"Option2"}>Option 2</MenuItem>
+                  <MenuItem value={"Option3"}>Option 3</MenuItem>
+                </Select>
+              )}
+            />
+          </FormControl>
         </Box>
         <Box sx={{ mt: 10, width: 500 }}>
-          <BasicDatePicker />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Controller
+              name="DatePicker"
+              control={control}
+              defaultValue={null}
+              render={({ field }) => (
+                <DatePicker
+                  {...field}
+                  label="Basic date picker"
+                  renderInput={(params) => <TextField fullWidth {...params} />}
+                />
+              )}
+            />
+          </LocalizationProvider>
         </Box>
         <Box sx={{ mt: 5 }}>
           <div className="d-flex">
-            <Checkbox {...label} />
-            <Typography sx={{ mt: 1 }}>Checkbox Option1</Typography>
+            <Controller
+              name="Checkbox1"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} {...label} />}
+                  label="Checkbox Option1"
+                />
+              )}
+            />
           </div>
           <div className="d-flex">
-            <Checkbox {...label} />
-            <Typography sx={{ mt: 1 }}>Checkbox Option2</Typography>
+            <Controller
+              name="Checkbox2"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} {...label} />}
+                  label="Checkbox Option2"
+                />
+              )}
+            />
           </div>
         </Box>
         <Box sx={{ width: 500 }}>
-          <Slider
-            fullWidth
+          <Controller
+            name="SliderValue"
+            control={control}
             defaultValue={50}
-            aria-label="Small"
-            valueLabelDisplay="auto"
-            sx={{ mt: 5 }}
+            render={({ field }) => (
+              <Slider
+                {...field}
+                valueLabelDisplay="auto"
+                aria-label="Small"
+                defaultValue={50}
+                sx={{ mt: 5 }}
+              />
+            )}
           />
         </Box>
         <Box sx={{ mt: 5 }}>
@@ -111,7 +170,11 @@ export default function Forma1() {
             Submit
           </Button>
         </Box>
-        <Button sx={{ mt: 5, width: 500 }} className="shadow mb-5">
+        <Button
+          sx={{ mt: 5, width: 500 }}
+          onClick={() => reset()}
+          className="shadow mb-5"
+        >
           Reset
         </Button>
       </Grid>
