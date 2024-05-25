@@ -26,13 +26,14 @@ export default function Forma1() {
 
   const submit = (data) => {
     console.log(data);
+    console.log();
     reset();
   };
   console.log(errors);
 
   return (
     <Box sx={{ mt: 3 }} onSubmit={handleSubmit(submit)} component={"form"}>
-      <Typography variant="body1">Demo forma</Typography>
+      <Typography variant="body1">Demo forma1</Typography>
       <Box>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} lg={4} sx={{ mt: 3 }}>
