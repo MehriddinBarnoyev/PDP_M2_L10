@@ -49,7 +49,7 @@ export default function Forma1() {
               fullWidth
               error={!!errors.Name}
               {...register("Name", {
-                required: "Ismingizni kiriting",
+                required:" Ismingizni kiriting",
                 minLength: 5,
                 maxLength: 255,
               })}
